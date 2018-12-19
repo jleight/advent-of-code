@@ -9,10 +9,14 @@ namespace AoC.Y2018.Solutions
     {
         public override Task Run()
         {
-            foreach (var a in InputLines)
+            for (var ai = 0; ai < InputLines.Length; ai++)
             {
-                foreach (var b in InputLines)
+                var a = InputLines[ai];
+
+                for (var bi = ai + 1; bi < InputLines.Length; bi++)
                 {
+                    var b = InputLines[bi];
+
                     var diffs = 0;
                     for (var i = 0; i < a.Length; i++)
                     {

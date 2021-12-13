@@ -1,9 +1,8 @@
-using System.Threading.Tasks;
+using AoC.Contexts;
 
-namespace AoC.Abstractions
+namespace AoC.Abstractions;
+
+public interface ISolution
 {
-    public interface ISolution
-    {
-        Task Run();
-    }
+    Task Run(SolutionContext context);
 }

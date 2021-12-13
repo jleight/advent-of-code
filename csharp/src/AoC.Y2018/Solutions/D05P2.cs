@@ -1,31 +1,28 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using AoC.Abstractions;
+namespace AoC.Y2018.Solutions;
 
-namespace AoC.Y2018.Solutions
+[UsedImplicitly]
+public class D05P2 : ISolution
 {
-    public class D05P2 : SolutionBase
+    public Task Run(SolutionContext context)
     {
-        public override Task Run()
-        {
-            var result = InputString
-                .ToUpperInvariant()
-                .Distinct()
-                .ToList()
-                .Select(unit => Replace(unit, InputString))
-                .Select(D05P1.React)
-                .Min(polymer => polymer.Length);
+        var input = context.InputString;
 
-            Console.WriteLine(result);
-            return Task.CompletedTask;
-        }
+        var result = input
+            .ToUpperInvariant()
+            .Distinct()
+            .ToList()
+            .Select(unit => Replace(unit, input))
+            .Select(D05P1.React)
+            .Min(polymer => polymer.Length);
 
-        private static string Replace(char unit, string polymer)
-        {
-            return polymer
-                .Replace(unit.ToString(), string.Empty)
-                .Replace(char.ToLowerInvariant(unit).ToString(), string.Empty);
-        }
+        Console.WriteLine(result);
+        return Task.CompletedTask;
+    }
+
+    private static string Replace(char unit, string polymer)
+    {
+        return polymer
+            .Replace(unit.ToString(), string.Empty)
+            .Replace(char.ToLowerInvariant(unit).ToString(), string.Empty);
     }
 }

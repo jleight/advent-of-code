@@ -1,0 +1,21 @@
+<Project>
+
+  <PropertyGroup>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="AoC" />
+    <Using Include="AoC.Abstractions" />
+    <Using Include="AoC.Contexts" />
+    <Using Include="JetBrains.Annotations" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
+  </ItemGroup>
+
+</Project>

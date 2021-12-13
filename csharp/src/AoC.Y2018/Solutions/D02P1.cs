@@ -1,32 +1,27 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using AoC.Abstractions;
+namespace AoC.Y2018.Solutions;
 
-namespace AoC.Y2018.Solutions
+[UsedImplicitly]
+public class D02P1 : ISolution
 {
-    public class D02P1 : SolutionBase
+    public Task Run(SolutionContext context)
     {
-        public override Task Run()
-        {
-            var result = InputLines
-                .Select(Parse)
-                .Aggregate((a, e) => (a.Doubles + e.Doubles, a.Triples + e.Triples));
+        var (doubles, triples) = context.InputLines
+            .Select(Parse)
+            .Aggregate((a, e) => (a.Doubles + e.Doubles, a.Triples + e.Triples));
 
-            Console.WriteLine(result.Doubles * result.Triples);
-            return Task.CompletedTask;
-        }
+        Console.WriteLine(doubles * triples);
+        return Task.CompletedTask;
+    }
 
-        private static (int Doubles, int Triples) Parse(string barcode)
-        {
-            var counts = barcode
-                .GroupBy(c => c)
-                .Select(g => g.Count())
-                .Distinct()
-                .ToList();
-            var doubles = counts.Count(c => c == 2);
-            var triples = counts.Count(c => c == 3);
-            return (doubles, triples);
-        }
+    private static (int Doubles, int Triples) Parse(string barcode)
+    {
+        var counts = barcode
+            .GroupBy(c => c)
+            .Select(g => g.Count())
+            .Distinct()
+            .ToList();
+        var doubles = counts.Count(c => c == 2);
+        var triples = counts.Count(c => c == 3);
+        return (doubles, triples);
     }
 }

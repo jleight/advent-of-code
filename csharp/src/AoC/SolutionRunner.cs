@@ -1,5 +1,4 @@
 using System.Reflection;
-using AoC.Contexts;
 using CommandLine;
 using StackExchange.Profiling;
 
@@ -20,7 +19,7 @@ public static class SolutionRunner
 
         var solutionType = assembly
             .DefinedTypes
-            .Where(t => typeof(ISolution).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && t.IsPublic)
+            .Where(t => typeof(ISolution).IsAssignableFrom(t) && t is { IsAbstract: false, IsInterface: false, IsPublic: true })
             .FirstOrDefault(t => t.Name.Equals(args.Problem, StringComparison.OrdinalIgnoreCase));
 
         if (solutionType is null)
@@ -61,7 +60,7 @@ public static class SolutionRunner
         var inputString = await new StreamReader(input)
             .ReadToEndAsync();
         var inputLines = inputString
-            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            .Split('\r', '\n');
         return new(inputString, inputLines);
     }
 

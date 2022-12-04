@@ -1,5 +1,3 @@
-using AoC.Contexts;
-
 namespace AoC.Abstractions;
 
 public interface ISolution

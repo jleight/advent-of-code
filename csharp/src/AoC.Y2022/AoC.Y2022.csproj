@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Inputs/*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../AoC/AoC.csproj" />
+  </ItemGroup>
+
+</Project>

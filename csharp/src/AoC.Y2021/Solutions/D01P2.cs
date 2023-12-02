@@ -1,6 +1,5 @@
 namespace AoC.Y2021.Solutions;
 
-[UsedImplicitly]
 public class D01P2 : ISolution
 {
     private const int Window = 3;

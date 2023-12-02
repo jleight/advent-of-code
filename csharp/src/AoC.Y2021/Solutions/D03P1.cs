@@ -1,6 +1,5 @@
 namespace AoC.Y2021.Solutions;
 
-[UsedImplicitly]
 public class D03P1 : ISolution
 {
     public Task Run(SolutionContext context)

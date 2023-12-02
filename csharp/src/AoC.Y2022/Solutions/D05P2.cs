@@ -2,7 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace AoC.Y2022.Solutions;
 
-[UsedImplicitly]
 public partial class D05P2 : ISolution
 {
     private static readonly Regex _instructionFormat = MyRegex();

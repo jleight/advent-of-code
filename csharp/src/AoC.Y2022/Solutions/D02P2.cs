@@ -1,6 +1,5 @@
 namespace AoC.Y2022.Solutions;
 
-[UsedImplicitly]
 public class D02P2 : ISolution
 {
     private static readonly Dictionary<string, int> _pointsByCombination = new()

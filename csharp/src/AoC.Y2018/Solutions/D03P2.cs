@@ -2,7 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace AoC.Y2018.Solutions;
 
-[UsedImplicitly]
 public class D03P2 : ISolution
 {
     private static readonly Regex _parser = new (@"#(\d+) @ (\d+),(\d+): (\d+)x(\d+)");

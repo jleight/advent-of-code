@@ -11,6 +11,7 @@
   <ItemGroup>
     <Using Include="AoC" />
     <Using Include="AoC.Abstractions" />
+    <Using Include="AoC.Collections" />
     <Using Include="AoC.Contexts" />
     <Using Include="AoC.Extensions" />
     <Using Include="JetBrains.Annotations" />

@@ -7,78 +7,68 @@ public class D03P1 : ISolution
 
     public Task Run(SolutionContext context)
     {
-        var height = context.InputLines.Length + 2;
-        var width = context.InputLines[0].Length + 2;
-        var grid = new ICell[height, width];
+        var grid = Grid.New(
+            context.InputLines[0].Length,
+            context.InputLines.Length,
+            _emptyCell);
 
-        for (var y = 0; y < height; y++)
+        for (var y = 0; y < grid.Height; y++)
+        for (var x = 0; x < grid.Width; x++)
         {
-            for (var x = 0; x < width; x++)
+            var rest = context.InputLines[y][x..];
+            var character = rest[0];
+
+            if (character == '.')
+                continue;
+
+            if (!char.IsDigit(character))
             {
-                if (y == 0 || y == height - 1 ||
-                    x == 0 || x == width - 1)
-                {
-                    grid[y, x] = _emptyCell;
-                    continue;
-                }
-
-                var rest = context.InputLines[y - 1][(x - 1)..];
-                var character = rest[0];
-
-                if (character == '.')
-                {
-                    grid[y, x] = _emptyCell;
-                }
-                else if (char.IsDigit(character))
-                {
-                    var numbers = rest
-                        .TakeWhile(char.IsDigit)
-                        .ToArray();
-                    var partNumber = int.Parse(new string(numbers));
-
-                    var cell = new PartNumberCell(x, y, partNumber);
-                    for (var i = 0; i < numbers.Length; i++)
-                        grid[y, x++] = cell;
-
-                    x--;
-                }
-                else
-                {
-                    grid[y, x] = _symbolCell;
-                }
+                grid[x, y] = _symbolCell;
+                continue;
             }
+
+            var numbers = rest
+                .TakeWhile(char.IsDigit)
+                .ToArray();
+            var partNumber = int.Parse(new string(numbers));
+
+            var cell = new PartNumberCell(x, y, partNumber);
+            for (var i = 0; i < numbers.Length; i++)
+                grid[x++, y] = cell;
+
+            x--;
         }
 
-        var adjacent = new HashSet<PartNumberCell>();
-
-        for (var y = 0; y < height; y++)
-        {
-            for (var x = 0; x < width; x++)
+        var result = grid
+            .Select((point, value) =>
             {
-                if (grid[y, x] is not PartNumberCell p)
-                    continue;
+                if (value is not PartNumberCell p)
+                    return default;
 
-                if (grid[y - 1, x - 1] is SymbolCell)
-                    adjacent.Add(p);
-                else if (grid[y - 1, x] is SymbolCell)
-                    adjacent.Add(p);
-                else if (grid[y - 1, x + 1] is SymbolCell)
-                    adjacent.Add(p);
-                else if (grid[y, x - 1] is SymbolCell)
-                    adjacent.Add(p);
-                else if (grid[y, x + 1] is SymbolCell)
-                    adjacent.Add(p);
-                else if (grid[y + 1, x - 1] is SymbolCell)
-                    adjacent.Add(p);
-                else if (grid[y + 1, x] is SymbolCell)
-                    adjacent.Add(p);
-                else if (grid[y + 1, x + 1] is SymbolCell)
-                    adjacent.Add(p);
-            }
-        }
+                var (x, y) = point;
 
-        var result = adjacent
-            .Sum(c => c.Number);
+                if (grid[x - 1, y - 1] is SymbolCell)
+                    return p;
+                if (grid[x, y - 1] is SymbolCell)
+                    return p;
+                if (grid[x + 1, y - 1] is SymbolCell)
+                    return p;
+                if (grid[x - 1, y] is SymbolCell)
+                    return p;
+                if (grid[x + 1, y] is SymbolCell)
+                    return p;
+                if (grid[x - 1, y + 1] is SymbolCell)
+                    return p;
+                if (grid[x, y + 1] is SymbolCell)
+                    return p;
+                if (grid[x + 1, y + 1] is SymbolCell)
+                    return p;
+
+                return default;
+            })
+            .OfType<PartNumberCell>()
+            .ToHashSet()
+            .Sum(p => p.Number);
 
         Console.WriteLine(result);
         return Task.CompletedTask;

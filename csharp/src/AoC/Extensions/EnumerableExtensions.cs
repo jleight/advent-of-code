@@ -30,4 +30,14 @@ public static class EnumerableExtensions
                 return x;
             });
     }
+
+    public static IEnumerable<T> Repeat<T>(
+        this ICollection<T> source)
+    {
+        while (true)
+        {
+            foreach (var item in source)
+                yield return item;
+        }
+    }
 }

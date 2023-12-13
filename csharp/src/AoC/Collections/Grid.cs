@@ -9,6 +9,7 @@ public class Grid<T>(
 
     public int Width { get; } = width;
     public int Height { get; } = height;
+    public int Count => _cells.Count;
 
     public T this[int x, int y]
     {
@@ -38,4 +39,17 @@ public static class Grid
 {
     public static Grid<T> New<T>(int width, int height, T defaultValue)
         => new(width, height, defaultValue);
+}
+
+public static class GridExtensions
+{
+    public static void Print(this Grid<char> grid)
+    {
+        for (var y = 0; y < grid.Height; y++)
+        {
+            for (var x = 0; x < grid.Width; x++)
+                Console.Write(grid[x, y]);
+            Console.WriteLine();
+        }
+    }
 }

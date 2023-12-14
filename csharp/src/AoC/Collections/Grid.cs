@@ -1,9 +1,12 @@
+using System.Collections;
+
 namespace AoC.Collections;
 
 public class Grid<T>(
-    int width,
-    int height,
-    T defaultValue)
+        int width,
+        int height,
+        T defaultValue)
+    : IEnumerable<(int X, int Y, T cell)>
 {
     private readonly Dictionary<(int X, int Y), T> _cells = new();
 
@@ -33,6 +36,16 @@ public class Grid<T>(
                 yield return action((x, y), this[x, y]);
         }
     }
+
+    public IEnumerator<(int X, int Y, T cell)> GetEnumerator()
+    {
+        return _cells
+            .Select(p => (p.Key.X, p.Key.Y, p.Value))
+            .GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+        => GetEnumerator();
 }
 
 public static class Grid

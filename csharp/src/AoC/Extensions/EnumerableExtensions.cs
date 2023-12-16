@@ -40,4 +40,29 @@ public static class EnumerableExtensions
                 yield return item;
         }
     }
+
+    public static IEnumerable<T[]> ChunkBy<T>(
+        this IEnumerable<T> source,
+        Func<T, bool> predicate)
+    {
+        var chunk = new List<T>();
+
+        foreach (var item in source)
+        {
+            if (!predicate(item))
+            {
+                chunk.Add(item);
+                continue;
+            }
+
+            if (chunk.Count <= 0)
+                continue;
+
+            yield return chunk.ToArray();
+            chunk.Clear();
+        }
+
+        if (chunk.Count > 0)
+            yield return chunk.ToArray();
+    }
 }

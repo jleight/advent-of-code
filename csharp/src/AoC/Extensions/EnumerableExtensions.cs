@@ -43,26 +43,27 @@ public static class EnumerableExtensions
 
     public static IEnumerable<T[]> ChunkBy<T>(
         this IEnumerable<T> source,
-        Func<T, bool> predicate)
+        Func<T, bool> predicate,
+        bool includeEmptyChunks = false)
     {
         var chunk = new List<T>();
 
         foreach (var item in source)
         {
-            if (!predicate(item))
+            if (predicate(item))
+            {
+                if (chunk.Count > 0 || includeEmptyChunks)
+                    yield return chunk.ToArray();
+
+                chunk.Clear();
+            }
+            else
             {
                 chunk.Add(item);
-                continue;
             }
-
-            if (chunk.Count <= 0)
-                continue;
-
-            yield return chunk.ToArray();
-            chunk.Clear();
         }
 
-        if (chunk.Count > 0)
+        if (chunk.Count > 0 || includeEmptyChunks)
             yield return chunk.ToArray();
     }
 }

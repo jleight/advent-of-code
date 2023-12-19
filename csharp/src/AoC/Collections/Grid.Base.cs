@@ -17,23 +17,12 @@ public class Grid<T>(
     public T this[int x, int y]
     {
         get => _cells.GetValueOrDefault((x, y), defaultValue);
-        set => _cells[(x, y)] = value;
-    }
-
-    public IEnumerable<TOut> Select<TOut>(
-        Func<(int X, int Y), T, TOut> action,
-        bool skipEmpty = true)
-    {
-        if (skipEmpty)
+        set
         {
-            foreach (var (key, value) in _cells)
-                yield return action(key, value);
-        }
-        else
-        {
-            for (var y = 0; y < Height; y++)
-            for (var x = 0; x < Width; x++)
-                yield return action((x, y), this[x, y]);
+            if (Comparer<T>.Default.Compare(value, defaultValue) == 0)
+                _cells.Remove((x, y));
+            else
+                _cells[(x, y)] = value;
         }
     }
 
@@ -52,17 +41,4 @@ public static class Grid
 {
     public static Grid<T> New<T>(int width, int height, T defaultValue)
         => new(width, height, defaultValue);
-}
-
-public static class GridExtensions
-{
-    public static void Print(this Grid<char> grid)
-    {
-        for (var y = 0; y < grid.Height; y++)
-        {
-            for (var x = 0; x < grid.Width; x++)
-                Console.Write(grid[x, y]);
-            Console.WriteLine();
-        }
-    }
 }

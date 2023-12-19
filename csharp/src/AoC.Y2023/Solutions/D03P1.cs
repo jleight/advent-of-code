@@ -40,12 +40,12 @@ public class D03P1 : ISolution
         }
 
         var result = grid
-            .Select((point, value) =>
+            .Select(cell =>
             {
+                var (x, y, value) = cell;
+
                 if (value is not PartNumberCell p)
                     return default;
-
-                var (x, y) = point;
 
                 if (grid[x - 1, y - 1] is SymbolCell)
                     return p;

@@ -41,12 +41,13 @@ public class D03P2 : ISolution
         }
 
         var result = grid
-            .Select((point, value) =>
+            .Select(cell =>
             {
+                var (x, y, value) = cell;
+
                 if (value is not GearCell)
                     return 0;
 
-                var (x, y) = point;
                 var adjacent = new HashSet<PartNumberCell>();
 
                 if (grid[x - 1, y - 1] is PartNumberCell p1)

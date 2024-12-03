@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <AnalysisLevel>preview</AnalysisLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,10 +17,6 @@
     <Using Include="AoC.Extensions" />
     <Using Include="AoC.Utils" />
     <Using Include="JetBrains.Annotations" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
   </ItemGroup>
 
 </Project>

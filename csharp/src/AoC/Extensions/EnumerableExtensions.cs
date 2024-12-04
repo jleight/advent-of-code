@@ -31,6 +31,39 @@ public static class EnumerableExtensions
             });
     }
 
+    public static IEnumerable<T> Tap<T>(
+        this IEnumerable<T> source)
+    {
+        return source
+            .Select(x =>
+            {
+                if (x is null)
+                    Console.WriteLine("<null>");
+                else if (x is string s)
+                    Console.WriteLine(s);
+                else
+                    Console.WriteLine(Convert.ToString(x) ?? "<not convertable to string>");
+                return x;
+            });
+    }
+
+    public static IEnumerable<T> Tap<T>(
+        this IEnumerable<T> source,
+        string message)
+    {
+        return source
+            .Select(x =>
+            {
+                if (x is null)
+                    Console.WriteLine($"[{message}]: <null>");
+                else if (x is string s)
+                    Console.WriteLine($"[{message}]: {s}");
+                else
+                    Console.WriteLine($"[{message}]: {Convert.ToString(x) ?? "<not convertable to string>"}");
+                return x;
+            });
+    }
+
     public static IEnumerable<T> Repeat<T>(
         this ICollection<T> source)
     {

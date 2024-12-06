@@ -42,8 +42,51 @@ public static class SolutionRunner
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(args.InputsPath))
+        {
+            var year = Assembly
+                .GetEntryAssembly()!
+                .GetName()
+                .Name!
+                .Split(".")
+                .Last()[1..];
+
+            args.InputsPath = Directory.GetCurrentDirectory();
+
+            while (args.InputsPath is not null)
+            {
+                var gitPath = Path.Combine(
+                    args.InputsPath,
+                    ".git");
+
+                if (Directory.Exists(gitPath))
+                {
+                    args.InputsPath = Path.Combine(
+                        args.InputsPath,
+                        "inputs",
+                        year);
+                    break;
+                }
+
+                args.InputsPath = Directory
+                    .GetParent(args.InputsPath)?
+                    .FullName;
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(args.InputsPath) ||
+            !Directory.Exists(args.InputsPath))
+        {
+            await Console.Error.WriteLineAsync("Could not find inputs folder!");
+            return;
+        }
+
+        var context = await CreateSolutionContext(
+            solutionType.Name,
+            args.InputsPath,
+            args.UseTestData);
+
         var profiler = MiniProfiler.StartNew(solutionType.Name);
-        var context = await CreateSolutionContext(assembly, solutionType.Name, args.UseTestData);
 
         using (profiler.Step("Run"))
             await solution.Run(context);
@@ -53,16 +96,16 @@ public static class SolutionRunner
     }
 
     private static async Task<SolutionContext> CreateSolutionContext(
-        Assembly assembly,
         string problem,
+        string inputsPath,
         bool useTestData)
     {
         var suffix = useTestData
             ? "_Test"
             : string.Empty;
 
-        var input = GetInput(assembly, $"{problem}{suffix}.txt") ??
-                    GetInput(assembly, $"{problem.Split("P").First()}{suffix}.txt") ??
+        var input = GetInput(inputsPath, $"{problem}{suffix}.txt") ??
+                    GetInput(inputsPath, $"{problem.Split("P").First()}{suffix}.txt") ??
                     throw new InvalidOperationException($"Could not find input for {problem}.");
 
         return await CreateSolutionContext(input);
@@ -79,16 +122,20 @@ public static class SolutionRunner
     }
 
     private static Stream? GetInput(
-        Assembly assembly,
+        string inputsPath,
         string name)
     {
-        var resource = assembly
-            .GetManifestResourceNames()
-            .FirstOrDefault(r => r.EndsWith(name));
-        if (resource is null)
-            return null;
+        var path = Path.Join(
+            inputsPath,
+            name);
 
-        return assembly
-            .GetManifestResourceStream(resource);
+        try
+        {
+            return File.OpenRead(path);
+        }
+        catch (FileNotFoundException)
+        {
+            return default;
+        }
     }
 }

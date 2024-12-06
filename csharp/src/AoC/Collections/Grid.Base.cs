@@ -6,7 +6,7 @@ public class Grid<T>(
         int width,
         int height,
         T defaultValue)
-    : IEnumerable<(int X, int Y, T cell)>
+    : IEnumerable<(int X, int Y, T Cell)>
 {
     private readonly Dictionary<(int X, int Y), T> _cells = new();
 
@@ -26,7 +26,7 @@ public class Grid<T>(
         }
     }
 
-    public IEnumerator<(int X, int Y, T cell)> GetEnumerator()
+    public IEnumerator<(int X, int Y, T Cell)> GetEnumerator()
     {
         return _cells
             .Select(p => (p.Key.X, p.Key.Y, p.Value))

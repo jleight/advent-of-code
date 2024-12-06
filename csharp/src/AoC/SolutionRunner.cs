@@ -6,21 +6,29 @@ namespace AoC;
 
 public static class SolutionRunner
 {
-    public static async Task Run(IEnumerable<string> args)
+    public static async Task Run(
+        IEnumerable<string> args)
     {
         await Parser.Default
             .ParseArguments<SolutionRunnerArguments>(args)
             .MapResult(Run, _ => Task.FromResult(-1));
     }
 
-    private static async Task Run(SolutionRunnerArguments args)
+    private static async Task Run(
+        SolutionRunnerArguments args)
     {
-        var assembly = Assembly.GetEntryAssembly() ?? throw new InvalidOperationException("No entry Assembly found!");
+        var assembly = Assembly.GetEntryAssembly() ??
+                       throw new InvalidOperationException("No entry Assembly found!");
 
-        var solutionType = assembly
+        var solutionTypes = assembly
             .DefinedTypes
-            .Where(t => typeof(ISolution).IsAssignableFrom(t) && t is { IsAbstract: false, IsInterface: false, IsPublic: true })
-            .FirstOrDefault(t => t.Name.Equals(args.Problem, StringComparison.OrdinalIgnoreCase));
+            .Where(t => typeof(ISolution).IsAssignableFrom(t))
+            .Where(t => t is { IsAbstract: false, IsInterface: false, IsPublic: true })
+            .OrderByDescending(t => t.Name);
+
+        var solutionType = string.IsNullOrWhiteSpace(args.Problem)
+            ? solutionTypes.FirstOrDefault()
+            : solutionTypes.FirstOrDefault(t => t.Name.Equals(args.Problem, StringComparison.OrdinalIgnoreCase));
 
         if (solutionType is null)
         {
@@ -44,9 +52,14 @@ public static class SolutionRunner
         Console.WriteLine(profiler.RenderPlainText());
     }
 
-    private static async Task<SolutionContext> CreateSolutionContext(Assembly assembly, string problem, bool useTestData)
+    private static async Task<SolutionContext> CreateSolutionContext(
+        Assembly assembly,
+        string problem,
+        bool useTestData)
     {
-        var suffix = useTestData ? "_Test" : string.Empty;
+        var suffix = useTestData
+            ? "_Test"
+            : string.Empty;
 
         var input = GetInput(assembly, $"{problem}{suffix}.txt") ??
                     GetInput(assembly, $"{problem.Split("P").First()}{suffix}.txt") ??
@@ -55,7 +68,8 @@ public static class SolutionRunner
         return await CreateSolutionContext(input);
     }
 
-    private static async Task<SolutionContext> CreateSolutionContext(Stream input)
+    private static async Task<SolutionContext> CreateSolutionContext(
+        Stream input)
     {
         var inputString = await new StreamReader(input)
             .ReadToEndAsync();
@@ -64,7 +78,9 @@ public static class SolutionRunner
         return new(inputString, inputLines);
     }
 
-    private static Stream? GetInput(Assembly assembly, string name)
+    private static Stream? GetInput(
+        Assembly assembly,
+        string name)
     {
         var resource = assembly
             .GetManifestResourceNames()

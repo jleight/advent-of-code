@@ -9,17 +9,36 @@ public class Grid<T>(
     : IEnumerable<(int X, int Y, T Cell)>
 {
     private readonly Dictionary<(int X, int Y), T> _cells = new();
+    private readonly T _default = defaultValue;
 
     public int Width { get; } = width;
     public int Height { get; } = height;
     public int Count => _cells.Count;
 
+    private Grid(Grid<T> other)
+        : this(other.Width, other.Height, other._default)
+    {
+        _cells = new Dictionary<(int X, int Y), T>(other._cells);
+    }
+
+    public bool IsDefault(int x, int y)
+        => !_cells.ContainsKey((x, y));
+
+    public bool IsInBounds(int x, int y)
+        => x >= 0 && x < Width && y >= 0 && y < Height;
+
+    public bool Remove(int x, int y)
+        => _cells.Remove((x, y));
+
+    public Grid<T> Clone()
+        => new(this);
+
     public T this[int x, int y]
     {
-        get => _cells.GetValueOrDefault((x, y), defaultValue);
+        get => _cells.GetValueOrDefault((x, y), _default);
         set
         {
-            if (Comparer<T>.Default.Compare(value, defaultValue) == 0)
+            if (Comparer<T>.Default.Compare(value, _default) == 0)
                 _cells.Remove((x, y));
             else
                 _cells[(x, y)] = value;

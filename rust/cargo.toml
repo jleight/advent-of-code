@@ -1,0 +1,5 @@
+[package]
+name = "advent-of-code"
+version = "0.1.0"
+edition = "2021"
+authors = ["Jonathon Leight <jonathon.leight@jleight.com>"]

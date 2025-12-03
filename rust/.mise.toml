@@ -9,3 +9,6 @@ run = "cargo clippy --fix"
 
 [tasks.run]
 run = "cargo run"
+
+[tasks.test]
+run = "cargo test"

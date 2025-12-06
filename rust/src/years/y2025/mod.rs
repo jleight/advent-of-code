@@ -6,6 +6,8 @@ mod d02p1;
 mod d02p2;
 mod d03p1;
 mod d03p2;
+mod d04p1;
+mod d04p2;
 
 pub fn get_solver(day: u8, part: u8) -> Option<fn(&SolutionContext) -> String> {
     match (day, part) {
@@ -15,6 +17,8 @@ pub fn get_solver(day: u8, part: u8) -> Option<fn(&SolutionContext) -> String> {
         (2, 2) => Some(d02p2::solve),
         (3, 1) => Some(d03p1::solve),
         (3, 2) => Some(d03p2::solve),
+        (4, 1) => Some(d04p1::solve),
+        (4, 2) => Some(d04p2::solve),
         _ => None,
     }
 }

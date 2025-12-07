@@ -1,9 +1,7 @@
-use crate::utils::SolutionContext;
-
-pub fn solve(ctx: &SolutionContext) -> String {
-    ctx.input_lines
-        .iter()
-        .map(|l| Game::parse(l))
+pub fn solve(input: &str) -> String {
+    input
+        .lines()
+        .map(Game::parse)
         .map(|g| g.power())
         .sum::<u32>()
         .to_string()
@@ -23,9 +21,15 @@ impl Reveal {
         let mut blue = 0;
 
         for cube_count in input.split(',') {
-            let split: Vec<&str> = cube_count.split_whitespace().collect();
+            let split: Vec<&str> = cube_count
+                .split_whitespace()
+                .collect();
 
-            assert_eq!(split.len(), 2, "expected '[count] [color]', got {cube_count}");
+            assert_eq!(
+                split.len(),
+                2,
+                "expected '[count] [color]', got {cube_count}"
+            );
 
             let Ok(count) = split[0].parse::<u32>() else {
                 panic!("failed to parse count from '{}'", split[0]);
@@ -54,15 +58,33 @@ impl Game {
             panic!("expected 'Game [id]: [reveals...]', got {input}");
         };
 
-        let reveals = reveals.split("; ").map(Reveal::parse).collect();
+        let reveals = reveals
+            .split("; ")
+            .map(Reveal::parse)
+            .collect();
 
         Self { reveals }
     }
 
     fn power(&self) -> u32 {
-        let min_red = self.reveals.iter().map(|r| r.red).max().unwrap_or(1);
-        let min_green = self.reveals.iter().map(|r| r.green).max().unwrap_or(1);
-        let min_blue = self.reveals.iter().map(|r| r.blue).max().unwrap_or(1);
+        let min_red = self
+            .reveals
+            .iter()
+            .map(|r| r.red)
+            .max()
+            .unwrap_or(1);
+        let min_green = self
+            .reveals
+            .iter()
+            .map(|r| r.green)
+            .max()
+            .unwrap_or(1);
+        let min_blue = self
+            .reveals
+            .iter()
+            .map(|r| r.blue)
+            .max()
+            .unwrap_or(1);
 
         min_red * min_green * min_blue
     }
@@ -70,21 +92,30 @@ impl Game {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::SolutionContext;
+    use crate::aoc::{InputType, Problem};
+    use eyre::Result;
 
     #[test]
-    fn test_test() {
-        let ctx = SolutionContext::for_problem(2023, 2, 2, true);
-        let answer = ctx.answer.clone().unwrap();
+    fn test_sample() -> Result<()> {
+        let problem = Problem::load(2023, 2)?;
 
-        assert_eq!(answer, super::solve(&ctx));
+        let input = problem.get_input(2, &InputType::Sample)?;
+        let answer = problem.get_answer(2, &InputType::Sample)?;
+
+        assert_eq!(answer, super::solve(&input));
+
+        Ok(())
     }
 
     #[test]
-    fn test_full() {
-        let ctx = SolutionContext::for_problem(2023, 2, 2, false);
-        let answer = ctx.answer.clone().unwrap();
+    fn test_full() -> Result<()> {
+        let problem = Problem::load(2023, 2)?;
 
-        assert_eq!(answer, super::solve(&ctx));
+        let input = problem.get_input(2, &InputType::Full)?;
+        let answer = problem.get_answer(2, &InputType::Full)?;
+
+        assert_eq!(answer, super::solve(&input));
+
+        Ok(())
     }
 }

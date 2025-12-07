@@ -1,23 +1,9 @@
-#![warn(
-    future_incompatible,
-    keyword_idents,
-    let_underscore,
-    nonstandard_style,
-    refining_impl_trait,
-    rust_2018_compatibility,
-    rust_2018_idioms,
-    rust_2021_compatibility,
-    rust_2024_compatibility,
-    unused
-)]
-#![warn(clippy::pedantic, clippy::nursery)]
-
-use crate::utils::SolutionContext;
+use crate::aoc::{InputType, Problem};
 use crate::years::get_solver;
 use std::env;
 use std::time::Instant;
 
-mod utils;
+mod aoc;
 mod years;
 
 fn main() {
@@ -36,17 +22,27 @@ fn main() {
         .and_then(|p| p.parse::<u8>().ok())
         .expect("invalid argument: part");
 
-    let test = env::args().nth(4) == Some("--test".to_string());
+    let input_type = if env::args().nth(4) == Some("--sample".to_string()) {
+        InputType::Sample
+    } else {
+        InputType::Full
+    };
 
     let Some(solver) = get_solver(year, day, part) else {
         panic!("missing solution: Y{year}D{day:0>2}P{part}");
     };
 
-    let ctx = SolutionContext::for_problem(year, day, part, test);
-    let answer = ctx.answer.clone();
+    let problem = Problem::load(year, day).expect("failed to load problem data");
+
+    let input = problem
+        .get_input(part, &input_type)
+        .expect("failed to load sample input");
+    let answer = problem
+        .get_answer(part, &input_type)
+        .ok();
 
     let start = Instant::now();
-    let solution = solver(&ctx);
+    let solution = solver(&input);
     let delta = start.elapsed();
 
     let check = match answer {

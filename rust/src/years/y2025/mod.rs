@@ -1,5 +1,3 @@
-use crate::utils::SolutionContext;
-
 mod d01p1;
 mod d01p2;
 mod d02p1;
@@ -10,8 +8,10 @@ mod d04p1;
 mod d04p2;
 mod d05p1;
 mod d05p2;
+mod d06p1;
+mod d06p2;
 
-pub fn get_solver(day: u8, part: u8) -> Option<fn(&SolutionContext) -> String> {
+pub fn get_solver(day: u8, part: u8) -> Option<fn(&str) -> String> {
     match (day, part) {
         (1, 1) => Some(d01p1::solve),
         (1, 2) => Some(d01p2::solve),
@@ -23,6 +23,8 @@ pub fn get_solver(day: u8, part: u8) -> Option<fn(&SolutionContext) -> String> {
         (4, 2) => Some(d04p2::solve),
         (5, 1) => Some(d05p1::solve),
         (5, 2) => Some(d05p2::solve),
+        (6, 1) => Some(d06p1::solve),
+        (6, 2) => Some(d06p2::solve),
         _ => None,
     }
 }

@@ -1,7 +1,6 @@
-use crate::utils::SolutionContext;
 use std::collections::HashMap;
 
-pub fn solve(ctx: &SolutionContext) -> String {
+pub fn solve(input: &str) -> String {
     let digits = HashMap::from([
         ("1", 1),
         ("one", 1),
@@ -23,8 +22,8 @@ pub fn solve(ctx: &SolutionContext) -> String {
         ("nine", 9),
     ]);
 
-    ctx.input_lines
-        .iter()
+    input
+        .lines()
         .map(|line| {
             let mut first = 0;
             let mut last = 0;
@@ -59,21 +58,30 @@ pub fn solve(ctx: &SolutionContext) -> String {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::SolutionContext;
+    use crate::aoc::{InputType, Problem};
+    use eyre::Result;
 
     #[test]
-    fn test_test() {
-        let ctx = SolutionContext::for_problem(2023, 1, 2, true);
-        let answer = ctx.answer.clone().unwrap();
+    fn test_sample() -> Result<()> {
+        let problem = Problem::load(2023, 1)?;
 
-        assert_eq!(answer, super::solve(&ctx));
+        let input = problem.get_input(2, &InputType::Sample)?;
+        let answer = problem.get_answer(2, &InputType::Sample)?;
+
+        assert_eq!(answer, super::solve(&input));
+
+        Ok(())
     }
 
     #[test]
-    fn test_full() {
-        let ctx = SolutionContext::for_problem(2023, 1, 2, false);
-        let answer = ctx.answer.clone().unwrap();
+    fn test_full() -> Result<()> {
+        let problem = Problem::load(2023, 1)?;
 
-        assert_eq!(answer, super::solve(&ctx));
+        let input = problem.get_input(2, &InputType::Full)?;
+        let answer = problem.get_answer(2, &InputType::Full)?;
+
+        assert_eq!(answer, super::solve(&input));
+
+        Ok(())
     }
 }

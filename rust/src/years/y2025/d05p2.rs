@@ -1,17 +1,21 @@
-use crate::utils::SolutionContext;
-
-pub fn solve(ctx: &SolutionContext) -> String {
+pub fn solve(input: &str) -> String {
     let mut fresh = Vec::new();
 
-    for line in ctx.input_lines.iter() {
+    for line in input.lines() {
         if line.is_empty() {
             break;
         }
 
-        let (start, end) = line.split_once('-').expect("range should contain a '-'");
+        let (start, end) = line
+            .split_once('-')
+            .expect("range should contain a '-'");
 
-        let start = start.parse::<u64>().expect("start is not a number");
-        let end = end.parse::<u64>().expect("end is not a number");
+        let start = start
+            .parse::<u64>()
+            .expect("start is not a number");
+        let end = end
+            .parse::<u64>()
+            .expect("end is not a number");
 
         fresh.push(start..=end);
     }
@@ -28,8 +32,8 @@ pub fn solve(ctx: &SolutionContext) -> String {
                 let a = fresh[ai].clone();
                 let b = fresh[bi].clone();
 
-                let contains_start = a.contains(&b.start());
-                let contains_end = a.contains(&b.end());
+                let contains_start = a.contains(b.start());
+                let contains_end = a.contains(b.end());
 
                 if !contains_start && !contains_end {
                     continue;
@@ -63,21 +67,30 @@ pub fn solve(ctx: &SolutionContext) -> String {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::SolutionContext;
+    use crate::aoc::{InputType, Problem};
+    use eyre::Result;
 
     #[test]
-    fn test_test() {
-        let ctx = SolutionContext::for_problem(2025, 5, 2, true);
-        let answer = ctx.answer.clone().unwrap();
+    fn test_sample() -> Result<()> {
+        let problem = Problem::load(2025, 5)?;
 
-        assert_eq!(answer, super::solve(&ctx));
+        let input = problem.get_input(2, &InputType::Sample)?;
+        let answer = problem.get_answer(2, &InputType::Sample)?;
+
+        assert_eq!(answer, super::solve(&input));
+
+        Ok(())
     }
 
     #[test]
-    fn test_full() {
-        let ctx = SolutionContext::for_problem(2025, 5, 2, false);
-        let answer = ctx.answer.clone().unwrap();
+    fn test_full() -> Result<()> {
+        let problem = Problem::load(2025, 5)?;
 
-        assert_eq!(answer, super::solve(&ctx));
+        let input = problem.get_input(2, &InputType::Full)?;
+        let answer = problem.get_answer(2, &InputType::Full)?;
+
+        assert_eq!(answer, super::solve(&input));
+
+        Ok(())
     }
 }

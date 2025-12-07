@@ -1,0 +1,31 @@
+[package]
+name = "advent-of-code"
+version = "0.1.0"
+edition = "2021"
+authors = ["Jonathon Leight <jonathon.leight@jleight.com>"]
+
+[dependencies]
+eyre = "0.6.12"
+rpkl = "0.7.0"
+serde = { version = "1.0.228", features = ["derive"] }
+
+[lints.rust]
+future_incompatible = "warn"
+keyword_idents = "warn"
+let_underscore = "warn"
+nonstandard_style = "warn"
+refining_impl_trait = "warn"
+rust_2018_compatibility = "warn"
+rust_2018_idioms = "warn"
+rust_2021_compatibility = "warn"
+rust_2024_compatibility = "warn"
+unused = "warn"
+
+[lines.clippy]
+fallible_impl_from = "warn"
+fn_params_excessive_bools = "warn"
+must_use_candidate = "warn"
+nursery = "warn"
+pedantic = "warn"
+unneeded_field_pattern = "warn"
+wildcard_enum_match_arm = "warn"

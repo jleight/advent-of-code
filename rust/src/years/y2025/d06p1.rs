@@ -1,27 +1,29 @@
+use std::collections::BTreeMap;
+
 pub fn solve(input: &str) -> String {
     input
         .lines()
-        .enumerate()
-        .map(|(i, line)| {
-            let mut digits = line
-                .chars()
-                .filter(char::is_ascii_digit);
+        .fold(BTreeMap::new(), |mut a, e| {
+            let split = e.split_whitespace();
 
-            let Some(first) = digits
-                .next()
-                .and_then(|c| c.to_digit(10))
-            else {
-                panic!("line {i} does not contain any digits: {line}");
-            };
+            for (i, s) in split.enumerate() {
+                let t = a
+                    .entry(i)
+                    .or_insert((0, 1));
 
-            let last = digits
-                .next_back()
-                .and_then(|c| c.to_digit(10))
-                .unwrap_or(first);
+                if let Ok(number) = s.parse::<u64>() {
+                    t.0 += number;
+                    t.1 *= number;
+                } else if s == "*" {
+                    t.0 = t.1;
+                }
+            }
 
-            first * 10 + last
+            a
         })
-        .sum::<u32>()
+        .iter()
+        .map(|(_, (v, _))| v)
+        .sum::<u64>()
         .to_string()
 }
 
@@ -32,7 +34,7 @@ mod tests {
 
     #[test]
     fn test_sample() -> Result<()> {
-        let problem = Problem::load(2023, 1)?;
+        let problem = Problem::load(2025, 6)?;
 
         let input = problem.get_input(1, &InputType::Sample)?;
         let answer = problem.get_answer(1, &InputType::Sample)?;
@@ -44,7 +46,7 @@ mod tests {
 
     #[test]
     fn test_full() -> Result<()> {
-        let problem = Problem::load(2023, 1)?;
+        let problem = Problem::load(2025, 6)?;
 
         let input = problem.get_input(1, &InputType::Full)?;
         let answer = problem.get_answer(1, &InputType::Full)?;

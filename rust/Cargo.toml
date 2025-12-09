@@ -1,7 +1,7 @@
 [package]
 name = "advent-of-code"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 authors = ["Jonathon Leight <jonathon.leight@jleight.com>"]
 
 [dependencies]
@@ -21,7 +21,7 @@ rust_2021_compatibility = "warn"
 rust_2024_compatibility = "warn"
 unused = "warn"
 
-[lines.clippy]
+[lints.clippy]
 fallible_impl_from = "warn"
 fn_params_excessive_bools = "warn"
 must_use_candidate = "warn"

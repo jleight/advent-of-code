@@ -53,7 +53,7 @@ pub fn solve(input: &str) -> String {
             Some(Operation::Add) => total += sum,
             Some(Operation::Multiply) => total += product,
             None => continue,
-        };
+        }
 
         sum = 0;
         product = 1;

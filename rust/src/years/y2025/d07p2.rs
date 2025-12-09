@@ -7,20 +7,20 @@ pub fn solve(input: &str) -> String {
         for (i, c) in line.chars().enumerate() {
             if c == 'S' {
                 beams.insert(i, 1);
-            } else if c == '^' {
-                if let Some(count) = beams.remove(&i) {
-                    let left_count = *beams
-                        .entry(i - 1)
-                        .or_default()
-                        + count;
-                    beams.insert(i - 1, left_count);
+            } else if c == '^'
+                && let Some(count) = beams.remove(&i)
+            {
+                let left_count = *beams
+                    .entry(i - 1)
+                    .or_default()
+                    + count;
+                beams.insert(i - 1, left_count);
 
-                    let right_count = *beams
-                        .entry(i + 1)
-                        .or_default()
-                        + count;
-                    beams.insert(i + 1, right_count);
-                }
+                let right_count = *beams
+                    .entry(i + 1)
+                    .or_default()
+                    + count;
+                beams.insert(i + 1, right_count);
             }
         }
     }

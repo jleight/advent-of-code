@@ -1,4 +1,4 @@
-use eyre::{eyre, OptionExt, Result, WrapErr};
+use eyre::{OptionExt, Result, WrapErr, eyre};
 use rpkl::from_config;
 use serde::Deserialize;
 use std::path::PathBuf;

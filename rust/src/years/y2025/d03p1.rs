@@ -31,11 +31,7 @@ pub fn solve(input: &str) -> String {
                 .max()
                 .expect("rest is empty");
 
-            if swap {
-                b * 10 + a
-            } else {
-                a * 10 + b
-            }
+            if swap { b * 10 + a } else { a * 10 + b }
         })
         .sum::<u32>()
         .to_string()

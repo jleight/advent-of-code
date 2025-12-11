@@ -55,15 +55,18 @@ impl Problem {
             InputType::Full => inputs
                 .full
                 .clone()
+                .and_then(|x| whitespace_as_none(x.as_str()))
                 .ok_or_eyre("missing full input"),
             InputType::Sample if part == 1 => inputs
                 .sample_1
                 .clone()
+                .and_then(|x| whitespace_as_none(x.as_str()))
                 .ok_or_eyre("missing sample input"),
             InputType::Sample => inputs
                 .sample_2
                 .clone()
                 .or_else(|| inputs.sample_1.clone())
+                .and_then(|x| whitespace_as_none(x.as_str()))
                 .ok_or_eyre("missing sample input"),
         }
     }
@@ -88,10 +91,12 @@ impl Problem {
             InputType::Sample => part_answers
                 .sample
                 .clone()
+                .and_then(|x| whitespace_as_none(x.as_str()))
                 .ok_or_eyre("missing sample answer"),
             InputType::Full => part_answers
                 .full
                 .clone()
+                .and_then(|x| whitespace_as_none(x.as_str()))
                 .ok_or_eyre("missing full answer"),
         }
     }
@@ -106,15 +111,12 @@ fn find_data_directory() -> Result<PathBuf> {
     Ok(dir)
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::aoc::Problem;
-    use eyre::Result;
+fn whitespace_as_none(str: &str) -> Option<String> {
+    let trimmed = str.trim();
 
-    #[test]
-    fn run() -> Result<()> {
-        let p = Problem::load(2025, 6).expect("failed to load problem");
-        println!("{p:?}");
-        Ok(())
+    if trimmed.is_empty() {
+        None
+    } else {
+        Some(trimmed.to_string())
     }
 }

@@ -8,6 +8,7 @@ version = "0.1.0"
 dependencies = [
  "eyre",
  "itertools 0.14.0",
+ "regex",
  "rpkl",
  "serde",
  "z3",

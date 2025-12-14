@@ -20,6 +20,7 @@ mod d10p1;
 mod d10p2;
 mod d11p1;
 mod d11p2;
+mod d12p1;
 
 pub fn get_solver(day: u8, part: u8) -> Option<fn(&str) -> String> {
     match (day, part) {
@@ -45,6 +46,7 @@ pub fn get_solver(day: u8, part: u8) -> Option<fn(&str) -> String> {
         (10, 2) => Some(d10p2::solve),
         (11, 1) => Some(d11p1::solve),
         (11, 2) => Some(d11p2::solve),
+        (12, 1) => Some(d12p1::solve),
         _ => None,
     }
 }

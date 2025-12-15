@@ -1,0 +1,14 @@
+[tools]
+rust = "latest"
+
+[tasks.lint]
+run = "cargo clippy"
+
+[tasks.fix]
+run = "cargo clippy --fix"
+
+[tasks.format]
+run = "cargo fmt"
+
+[tasks.run]
+run = "cargo run"

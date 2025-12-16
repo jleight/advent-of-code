@@ -1,67 +1,103 @@
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use snafu::prelude::*;
+use snafu::{OptionExt, ResultExt, Snafu};
 use std::collections::HashMap;
-use std::fs::{FileType, read_to_string};
-use std::{env, fs};
-use walkdir::WalkDir;
+use std::env::current_dir;
+use std::fs::{FileType, read_to_string, write};
+use std::path::{Path, PathBuf};
+use walkdir::{DirEntry, WalkDir};
 
-fn main() {
-    let Ok(cwd) = env::current_dir() else {
-        panic!("failed to get current directory");
-    };
+#[allow(clippy::enum_variant_names)]
+#[derive(Debug, Snafu)]
+enum Error {
+    #[snafu(display("Current working directory is invalid"))]
+    InvalidWorkingDirectory { source: std::io::Error },
 
-    let data_dir = cwd
+    #[snafu(display("Could not find a .git directory above: {cwd}"))]
+    MissingGitDirectory { cwd: String },
+
+    #[snafu(display("Could not find a .data directory in the git project root: {git_root}"))]
+    MissingDataDirectory { git_root: String },
+}
+
+type Result<T, E = Error> = std::result::Result<T, E>;
+
+fn find_data_root() -> Result<PathBuf> {
+    let cwd = current_dir().context(InvalidWorkingDirectorySnafu {})?;
+
+    let git_root = cwd
         .ancestors()
         .find(|a| a.join(".git").exists())
-        .expect("failed to find root of git repository")
-        .join(".data");
-    let output_file = data_dir.join("data.json");
+        .context(MissingGitDirectorySnafu {
+            cwd: cwd.display().to_string(),
+        })?;
 
-    let data_files = WalkDir::new(data_dir)
+    let data_root = git_root.join(".data");
+
+    ensure!(
+        data_root.exists(),
+        MissingDataDirectorySnafu {
+            git_root: git_root
+                .display()
+                .to_string()
+        }
+    );
+    Ok(data_root)
+}
+
+fn find_toml_files(data_dir: PathBuf) -> Vec<PathBuf> {
+    let is_toml = |e: &DirEntry| {
+        if !FileType::is_file(&e.file_type()) {
+            return false;
+        }
+
+        let extension = e
+            .path()
+            .extension()
+            .unwrap_or_default();
+        extension == "toml"
+    };
+
+    WalkDir::new(data_dir)
         .into_iter()
         .filter_map(Result::ok)
-        .filter(|e| FileType::is_file(&e.file_type()))
-        .filter(|e| {
-            e.path()
-                .extension()
-                .unwrap_or_default()
-                == "toml"
-        });
+        .filter(is_toml)
+        .map(DirEntry::into_path)
+        .collect()
+}
 
-    let mut all_tests = HashMap::new();
+fn convert_file(
+    toml_file: &Path,
+    data_file: &DataFile,
+) {
+    let json_file = toml_file.with_extension("json");
 
-    for data_file in data_files {
-        let day = data_file
-            .path()
-            .file_stem()
-            .expect("expected data file to have a name")
-            .to_str()
-            .expect("expected data file have a valid name");
-        let year = data_file
-            .path()
-            .parent()
-            .expect("expected data file to have a parent folder")
-            .file_name()
-            .expect("expected data file parent folder to have a name")
-            .to_str()
-            .expect("expected data file parent folder to have a valid name");
-        let key = format!("{year}-{day}");
+    let value = json!(data_file.tests);
+    let json = value.to_string();
 
-        let Ok(content) = read_to_string(data_file.path()) else {
+    if let Err(e) = write(json_file, json) {
+        eprintln!("failed to write json file: {e}");
+    }
+}
+
+fn main() -> Result<()> {
+    let data_dir = find_data_root()?;
+    let toml_files = find_toml_files(data_dir);
+
+    for toml_file in toml_files {
+        let Ok(content) = read_to_string(&toml_file) else {
+            eprintln!("failed to read file: {}", toml_file.display());
             continue;
         };
 
-        let Ok(parsed) = toml::from_str::<DataFile>(&content) else {
-            continue;
-        };
-
-        all_tests.insert(key, parsed.tests);
+        match toml::from_str::<DataFile>(&content) {
+            Ok(parsed) => convert_file(&toml_file, &parsed),
+            Err(e) => eprintln!("failed to parse file '{}': {}", toml_file.display(), e),
+        }
     }
 
-    let json = json!(all_tests);
-    let output = json.to_string();
-
-    fs::write(output_file, output).expect("failed to write aggregate tests file");
+    Ok(())
 }
 
 #[derive(Debug, Deserialize)]

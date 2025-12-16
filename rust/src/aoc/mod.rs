@@ -1,7 +1,8 @@
+mod errors;
 mod problem;
-mod solution;
-mod test_aoc;
+mod solution_test;
 
+pub use errors::*;
 pub use problem::{InputType, Problem};
-pub use solution::SolutionTest;
-pub(crate) use test_aoc::test_aoc;
+pub use solution_test::SolutionTest;
+pub(crate) use solution_test::test_solution;

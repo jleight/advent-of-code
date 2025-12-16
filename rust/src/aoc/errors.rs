@@ -1,8 +1,14 @@
 use snafu::Snafu;
 
 #[derive(Debug, Snafu)]
-#[snafu(visibility(pub(crate)))]
-pub(crate) enum Error {
+#[snafu(visibility(pub))]
+pub enum Error {
+    #[snafu(display("Invalid {name} argument"))]
+    InvalidArg { name: String },
+
+    #[snafu(display("No solver found for Y{year}D{day:0>2}P{part}"))]
+    MissingSolver { year: u16, day: u8, part: u8 },
+
     #[snafu(display("Current working directory is invalid"))]
     InvalidWorkingDirectory { source: std::io::Error },
 
@@ -35,6 +41,22 @@ pub(crate) enum Error {
 
     #[snafu(display("Solution file {year}/{day:0>2} test {name} input is invalid"))]
     InvalidSolutionTestInput { year: u16, day: u8, name: String },
+
+    #[snafu(display("Solution has an invalid return type"))]
+    InvalidSolutionReturnType,
+
+    #[snafu(display("Failed to parse input: expected '{expected}', got '{got}'"))]
+    UnexpectedInput { expected: &'static str, got: String },
+
+    #[snafu(display("Failed to parse input: expected '{expected}', got '{got}'"))]
+    FailedToParseInput {
+        source: std::num::ParseIntError,
+        expected: &'static str,
+        got: String,
+    },
+
+    #[snafu(display("Failed to solve the problem"))]
+    SolutionFailed,
 }
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;

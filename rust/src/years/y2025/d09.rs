@@ -1,6 +1,20 @@
 use itertools::Itertools;
 
-pub fn solve(input: &str) -> String {
+pub fn part_1(input: &str) -> u64 {
+    let red_tiles: Vec<Point> = input
+        .lines()
+        .map(Point::parse)
+        .collect();
+
+    red_tiles
+        .iter()
+        .tuple_combinations()
+        .map(|(a, b)| a.area(b))
+        .max()
+        .expect("iterator was empty")
+}
+
+pub fn part_2(input: &str) -> u64 {
     let red_tiles: Vec<Point> = input
         .lines()
         .map(Point::parse)
@@ -29,13 +43,12 @@ pub fn solve(input: &str) -> String {
         })
         .expect("no solution found")
         .1
-        .to_string()
 }
 
 #[derive(Debug, PartialEq)]
 struct Point {
-    x: i64,
-    y: i64,
+    x: u64,
+    y: u64,
 }
 
 impl Point {
@@ -66,30 +79,33 @@ impl Point {
 
 #[cfg(test)]
 mod tests {
-    use crate::aoc::{InputType, Problem};
-    use eyre::Result;
+    use super::{part_1, part_2};
+    use crate::aoc::{assert_solution, Result};
+
+    const YEAR: u16 = 2025;
+    const DAY: u8 = 9;
 
     #[test]
-    fn test_sample() -> Result<()> {
-        let problem = Problem::load(2025, 9)?;
-
-        let input = problem.get_input(2, &InputType::Sample)?;
-        let answer = problem.get_answer(2, &InputType::Sample)?;
-
-        assert_eq!(answer, super::solve(&input));
-
+    fn part_1_sample() -> Result<()> {
+        assert_solution!(part_1, "sample");
         Ok(())
     }
 
     #[test]
-    fn test_full() -> Result<()> {
-        let problem = Problem::load(2025, 9)?;
+    fn part_1_full() -> Result<()> {
+        assert_solution!(part_1, "full");
+        Ok(())
+    }
 
-        let input = problem.get_input(2, &InputType::Full)?;
-        let answer = problem.get_answer(2, &InputType::Full)?;
+    #[test]
+    fn part_2_sample() -> Result<()> {
+        assert_solution!(part_2, "sample");
+        Ok(())
+    }
 
-        assert_eq!(answer, super::solve(&input));
-
+    #[test]
+    fn part_2_full() -> Result<()> {
+        assert_solution!(part_2, "full");
         Ok(())
     }
 }

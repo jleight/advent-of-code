@@ -1,4 +1,43 @@
-pub fn solve(input: &str) -> String {
+pub fn part_1(input: &str) -> i32 {
+    let mut fresh = Vec::new();
+    let mut count = 0;
+
+    for line in input.lines() {
+        if line.is_empty() {
+            continue;
+        }
+
+        if line.contains('-') {
+            let (start, end) = line
+                .split_once('-')
+                .expect("range should contain a '-'");
+
+            let start = start
+                .parse::<u64>()
+                .expect("start is not a number");
+            let end = end
+                .parse::<u64>()
+                .expect("end is not a number");
+
+            fresh.push(start..=end);
+        } else {
+            let id = line
+                .parse::<u64>()
+                .expect("line is not a number");
+
+            if fresh
+                .iter()
+                .any(|range| range.contains(&id))
+            {
+                count += 1;
+            }
+        }
+    }
+
+    count
+}
+
+pub fn part_2(input: &str) -> u64 {
     let mut fresh = Vec::new();
 
     for line in input.lines() {
@@ -61,36 +100,38 @@ pub fn solve(input: &str) -> String {
     fresh
         .iter()
         .map(|range| range.end() - range.start() + 1)
-        .sum::<u64>()
-        .to_string()
+        .sum()
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::aoc::{InputType, Problem};
-    use eyre::Result;
+    use super::{part_1, part_2};
+    use crate::aoc::{assert_solution, Result};
+
+    const YEAR: u16 = 2025;
+    const DAY: u8 = 5;
 
     #[test]
-    fn test_sample() -> Result<()> {
-        let problem = Problem::load(2025, 5)?;
-
-        let input = problem.get_input(2, &InputType::Sample)?;
-        let answer = problem.get_answer(2, &InputType::Sample)?;
-
-        assert_eq!(answer, super::solve(&input));
-
+    fn part_1_sample() -> Result<()> {
+        assert_solution!(part_1, "sample");
         Ok(())
     }
 
     #[test]
-    fn test_full() -> Result<()> {
-        let problem = Problem::load(2025, 5)?;
+    fn part_1_full() -> Result<()> {
+        assert_solution!(part_1, "full");
+        Ok(())
+    }
 
-        let input = problem.get_input(2, &InputType::Full)?;
-        let answer = problem.get_answer(2, &InputType::Full)?;
+    #[test]
+    fn part_2_sample() -> Result<()> {
+        assert_solution!(part_2, "sample");
+        Ok(())
+    }
 
-        assert_eq!(answer, super::solve(&input));
-
+    #[test]
+    fn part_2_full() -> Result<()> {
+        assert_solution!(part_2, "full");
         Ok(())
     }
 }

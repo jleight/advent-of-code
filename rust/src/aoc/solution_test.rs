@@ -44,7 +44,7 @@ impl SolutionTest {
         })?;
 
         let test = json
-            .get(&name)
+            .get(name)
             .context(MissingSolutionTestSnafu {
                 year,
                 day,
@@ -76,7 +76,7 @@ impl SolutionTest {
             .and_then(|s| s.as_str())
             .map(|s| s.trim().to_string());
 
-        Ok(SolutionTest {
+        Ok(Self {
             input,
             part_1,
             part_2,
@@ -106,12 +106,3 @@ fn find_data_root() -> Result<PathBuf> {
 
     Ok(data_root)
 }
-
-macro_rules! test_solution {
-    ($year:literal, $day:literal, $test:literal, $part:ident) => {
-        let solution = crate::aoc::SolutionTest::load($year, $day, &$test)?;
-        assert_eq!(solution.$part, Some($part(&solution.input.as_str())));
-    };
-}
-
-pub(crate) use test_solution;

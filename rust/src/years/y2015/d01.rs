@@ -1,121 +1,123 @@
 use itertools::FoldWhile::{Continue, Done};
 use itertools::Itertools;
 
-pub fn part_1(input: &str) -> String {
+pub fn part_1(input: &str) -> i32 {
     parse(input)
         .iter()
-        .sum::<i32>()
-        .to_string()
+        .sum()
 }
 
-pub fn part_2(input: &str) -> String {
+pub fn part_2(input: &str) -> i128 {
     parse(input)
         .iter()
         .enumerate()
-        .map(|(i, e)| (i + 1, e))
+        .map(|(i, e)| (i as i128 + 1, i128::from(*e)))
         .fold_while(0, |a, (i, e)| {
             if a + e < 0 {
-                Done(i as i32)
+                Done(i)
             } else {
                 Continue(a + e)
             }
         })
         .into_inner()
-        .to_string()
 }
 
 fn parse(input: &str) -> Vec<i32> {
     input
         .chars()
-        .map(|c| if c == '(' { 1 } else { -1 })
+        .filter_map(|c| {
+            match c {
+                '(' => Some(1),
+                ')' => Some(-1),
+                _ => None
+            }
+        })
         .collect()
 }
 
 #[cfg(test)]
 mod tests {
     use super::{part_1, part_2};
-    use crate::aoc::test_solution;
-    use crate::aoc::{Result, SolutionTest};
+    use crate::aoc::{assert_solution, Result};
 
     const YEAR: u16 = 2015;
     const DAY: u8 = 1;
 
     #[test]
-    fn test_part_1_sample_a() -> Result<()> {
-        let solution = SolutionTest::load(YEAR, DAY, "a")?;
-        assert_eq!(solution.part_1, Some(part_1(&solution.input.as_str())));
+    fn part_1_sample_a() -> Result<()> {
+        assert_solution!(part_1, "a");
         Ok(())
     }
 
     #[test]
-    fn test_part_1_sample_b() -> Result<()> {
-        test_solution!(2015, 1, "b", part_1);
+    fn part_1_sample_b() -> Result<()> {
+        assert_solution!(part_1, "b");
         Ok(())
     }
 
     #[test]
-    fn test_part_1_sample_c() -> Result<()> {
-        test_solution!(2015, 1, "c", part_1);
+    fn part_1_sample_c() -> Result<()> {
+        assert_solution!(part_1, "c");
         Ok(())
     }
 
     #[test]
-    fn test_part_1_sample_d() -> Result<()> {
-        test_solution!(2015, 1, "d", part_1);
+    fn part_1_sample_d() -> Result<()> {
+        assert_solution!(part_1, "d");
         Ok(())
     }
 
     #[test]
-    fn test_part_1_sample_e() -> Result<()> {
-        test_solution!(2015, 1, "e", part_1);
+    fn part_1_sample_e() -> Result<()> {
+        assert_solution!(part_1, "e");
         Ok(())
     }
 
     #[test]
-    fn test_part_1_sample_f() -> Result<()> {
-        test_solution!(2015, 1, "f", part_1);
+    fn part_1_sample_f() -> Result<()> {
+        assert_solution!(part_1, "f");
         Ok(())
     }
 
     #[test]
-    fn test_part_1_sample_g() -> Result<()> {
-        test_solution!(2015, 1, "g", part_1);
+    fn part_1_sample_g() -> Result<()> {
+        assert_solution!(part_1, "g");
         Ok(())
     }
 
     #[test]
-    fn test_part_1_sample_h() -> Result<()> {
-        test_solution!(2015, 1, "h", part_1);
+    fn part_1_sample_h() -> Result<()> {
+        assert_solution!(part_1, "h");
         Ok(())
     }
 
     #[test]
-    fn test_part_1_sample_i() -> Result<()> {
-        test_solution!(2015, 1, "i", part_1);
+    fn part_1_sample_i() -> Result<()> {
+        assert_solution!(part_1, "h");
         Ok(())
     }
 
     #[test]
-    fn test_part_1_full() -> Result<()> {
-        test_solution!(2015, 1, "full", part_1);
+    fn part_1_full() -> Result<()> {
+        assert_solution!(part_1, "full");
         Ok(())
     }
 
     #[test]
-    fn test_part_2_sample_j() -> Result<()> {
-        test_solution!(2015, 1, "j", part_2);
+    fn part_2_sample_j() -> Result<()> {
+        assert_solution!(part_2, "j");
         Ok(())
     }
 
     #[test]
-    fn test_part_2_sample_k() -> Result<()> {
-        test_solution!(2015, 1, "k", part_2);
+    fn part_2_sample_k() -> Result<()> {
+        assert_solution!(part_2, "k");
         Ok(())
     }
 
     #[test]
-    fn test_part_2_full() -> Result<()> {
-        test_solution!(2015, 1, "full", part_2);
+    fn part_2_full() -> Result<()> {
+        assert_solution!(part_2, "full");
         Ok(())
     }
 }

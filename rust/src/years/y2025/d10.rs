@@ -1,7 +1,45 @@
+use itertools::Itertools;
 use z3::ast::Int;
 use z3::{Optimize, SatResult};
 
-pub fn solve(input: &str) -> String {
+pub fn part_1(input: &str) -> usize {
+    let machines: Vec<Machine> = input
+        .lines()
+        .map(Machine::parse)
+        .collect();
+
+    let mut sum = 0;
+
+    for machine in &machines {
+        for k in 1.. {
+            let found = machine
+                .buttons
+                .iter()
+                .combinations_with_replacement(k)
+                .any(|c| {
+                    let mut lights = vec![false; machine.lights.len()];
+
+                    for button in &c {
+                        for l in *button {
+                            let l = usize::try_from(*l).expect("invalid light index");
+                            lights[l] = !lights[l];
+                        }
+                    }
+
+                    lights == machine.lights
+                });
+
+            if found {
+                sum += k;
+                break;
+            }
+        }
+    }
+
+    sum
+}
+
+pub fn part_2(input: &str) -> u64 {
     let machines: Vec<Machine> = input
         .lines()
         .map(Machine::parse)
@@ -60,17 +98,19 @@ pub fn solve(input: &str) -> String {
         }
     }
 
-    sum.to_string()
+    sum
 }
 
 #[derive(Debug)]
 struct Machine {
+    lights: Vec<bool>,
     buttons: Vec<Vec<u64>>,
     joltages: Vec<u64>,
 }
 
 impl Machine {
     fn parse(line: &str) -> Self {
+        let mut lights = Vec::new();
         let mut buttons = Vec::new();
 
         let mut collection = Vec::new();
@@ -78,7 +118,10 @@ impl Machine {
 
         for c in line.chars() {
             match c {
-                '[' | '.' | '#' | ']' | ' ' | '}' => (),
+                '[' | ']' | ' ' => (),
+                '}' => break,
+                '.' => lights.push(false),
+                '#' => lights.push(true),
                 '(' | '{' => collection = Vec::new(),
                 ',' => {
                     let parsed = number
@@ -111,6 +154,7 @@ impl Machine {
         collection.push(parsed);
 
         Self {
+            lights,
             buttons,
             joltages: collection.clone(),
         }
@@ -119,30 +163,33 @@ impl Machine {
 
 #[cfg(test)]
 mod tests {
-    use crate::aoc::{InputType, Problem};
-    use eyre::Result;
+    use super::{part_1, part_2};
+    use crate::aoc::{assert_solution, Result};
+
+    const YEAR: u16 = 2025;
+    const DAY: u8 = 10;
 
     #[test]
-    fn test_sample() -> Result<()> {
-        let problem = Problem::load(2025, 10)?;
-
-        let input = problem.get_input(2, &InputType::Sample)?;
-        let answer = problem.get_answer(2, &InputType::Sample)?;
-
-        assert_eq!(answer, super::solve(&input));
-
+    fn part_1_sample() -> Result<()> {
+        assert_solution!(part_1, "sample");
         Ok(())
     }
 
     #[test]
-    fn test_full() -> Result<()> {
-        let problem = Problem::load(2025, 10)?;
+    fn part_1_full() -> Result<()> {
+        assert_solution!(part_1, "full");
+        Ok(())
+    }
 
-        let input = problem.get_input(2, &InputType::Full)?;
-        let answer = problem.get_answer(2, &InputType::Full)?;
+    #[test]
+    fn part_2_sample() -> Result<()> {
+        assert_solution!(part_2, "sample");
+        Ok(())
+    }
 
-        assert_eq!(answer, super::solve(&input));
-
+    #[test]
+    fn part_2_full() -> Result<()> {
+        assert_solution!(part_2, "full");
         Ok(())
     }
 }

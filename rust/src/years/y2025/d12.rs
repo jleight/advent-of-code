@@ -1,6 +1,6 @@
 use regex::Regex;
 
-pub fn solve(input: &str) -> String {
+pub fn part_1(input: &str) -> i32 {
     let region_pattern = Regex::new(r"(?m)^(\d+)x(\d+): (.+)$").unwrap();
     let mut count = 0;
 
@@ -25,35 +25,26 @@ pub fn solve(input: &str) -> String {
         count -= 1;
     }
 
-    count.to_string()
+    count
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::aoc::{InputType, Problem};
-    use eyre::Result;
+    use super::part_1;
+    use crate::aoc::{assert_solution, Result};
+
+    const YEAR: u16 = 2025;
+    const DAY: u8 = 12;
 
     #[test]
-    fn test_sample() -> Result<()> {
-        let problem = Problem::load(2025, 12)?;
-
-        let input = problem.get_input(1, &InputType::Sample)?;
-        let answer = problem.get_answer(1, &InputType::Sample)?;
-
-        assert_eq!(answer, super::solve(&input));
-
+    fn part_1_sample() -> Result<()> {
+        assert_solution!(part_1, "sample");
         Ok(())
     }
 
     #[test]
-    fn test_full() -> Result<()> {
-        let problem = Problem::load(2025, 12)?;
-
-        let input = problem.get_input(1, &InputType::Full)?;
-        let answer = problem.get_answer(1, &InputType::Full)?;
-
-        assert_eq!(answer, super::solve(&input));
-
+    fn part_1_full() -> Result<()> {
+        assert_solution!(part_1, "full");
         Ok(())
     }
 }

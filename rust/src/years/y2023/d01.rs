@@ -1,6 +1,24 @@
 use std::collections::HashMap;
+use snafu::OptionExt;
+use crate::aoc::{SolutionFailedSnafu, Result};
 
-pub fn solve(input: &str) -> String {
+pub fn part_1(input: &str) -> Result<u32> {
+    input
+        .lines()
+        .map(|line| {
+            let mut digits = line
+                .chars()
+                .filter_map(|c| c.to_digit(10));
+
+            let first = digits.next().context(SolutionFailedSnafu{})?;
+            let last = digits.next_back().unwrap_or(first);
+
+            Ok(first * 10 + last)
+        })
+        .sum()
+}
+
+pub fn part_2(input: &str) -> u32 {
     let digits = HashMap::from([
         ("1", 1),
         ("one", 1),
@@ -52,36 +70,38 @@ pub fn solve(input: &str) -> String {
 
             first * 10 + last
         })
-        .sum::<u32>()
-        .to_string()
+        .sum()
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::aoc::{InputType, Problem};
-    use eyre::Result;
+    use super::{part_1, part_2};
+    use crate::aoc::{assert_solution, Result};
+
+    const YEAR: u16 = 2023;
+    const DAY: u8 = 1;
 
     #[test]
-    fn test_sample() -> Result<()> {
-        let problem = Problem::load(2023, 1)?;
-
-        let input = problem.get_input(2, &InputType::Sample)?;
-        let answer = problem.get_answer(2, &InputType::Sample)?;
-
-        assert_eq!(answer, super::solve(&input));
-
+    fn part_1_sample_a() -> Result<()> {
+        assert_solution!(part_1, "a");
         Ok(())
     }
 
     #[test]
-    fn test_full() -> Result<()> {
-        let problem = Problem::load(2023, 1)?;
+    fn part_1_full() -> Result<()> {
+        assert_solution!(part_1, "full");
+        Ok(())
+    }
 
-        let input = problem.get_input(2, &InputType::Full)?;
-        let answer = problem.get_answer(2, &InputType::Full)?;
+    #[test]
+    fn part_2_sample_b() -> Result<()> {
+        assert_solution!(part_2, "b");
+        Ok(())
+    }
 
-        assert_eq!(answer, super::solve(&input));
-
+    #[test]
+    fn part_2_full() -> Result<()> {
+        assert_solution!(part_2, "full");
         Ok(())
     }
 }

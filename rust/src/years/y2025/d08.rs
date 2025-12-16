@@ -1,4 +1,7 @@
-pub fn solve(input: &str) -> String {
+use crate::aoc::Result;
+use std::collections::HashSet;
+
+pub fn part_1(input: &str) -> usize {
     let junction_boxes: Vec<Point> = input
         .lines()
         .map(Point::parse)
@@ -85,8 +88,55 @@ pub fn solve(input: &str) -> String {
         .iter()
         .take(3)
         .map(|c| c.len())
-        .product::<usize>()
-        .to_string()
+        .product()
+}
+
+pub fn part_2(input: &str) -> Result<f64> {
+    let junction_boxes: Vec<Point> = input
+        .lines()
+        .map(Point::parse)
+        .collect();
+    let junction_box_count = junction_boxes.len();
+
+    let mut distances: Vec<((&Point, &Point), f64)> = Vec::new();
+
+    for ai in 0..junction_box_count - 1 {
+        let a = &junction_boxes[ai];
+
+        for b in junction_boxes
+            .iter()
+            .skip(ai + 1)
+        {
+            distances.push(((a, b), a.distance_to(b)));
+        }
+    }
+
+    distances.sort_by(|a, b| b.1.total_cmp(&a.1));
+
+    let mut in_circuit = HashSet::new();
+
+    loop {
+        let connection = distances
+            .pop()
+            .expect("no more connections");
+        let (a, b) = connection.0;
+
+        let ai = junction_boxes
+            .iter()
+            .position(|p| p == a)
+            .unwrap();
+        let bi = junction_boxes
+            .iter()
+            .position(|p| p == b)
+            .unwrap();
+
+        in_circuit.insert(ai);
+        in_circuit.insert(bi);
+
+        if in_circuit.len() == junction_box_count {
+            return Ok(a.x * b.x);
+        }
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -130,30 +180,33 @@ impl Point {
 
 #[cfg(test)]
 mod tests {
-    use crate::aoc::{InputType, Problem};
-    use eyre::Result;
+    use super::{part_1, part_2};
+    use crate::aoc::{assert_solution, Result};
+
+    const YEAR: u16 = 2025;
+    const DAY: u8 = 8;
 
     #[test]
-    fn test_sample() -> Result<()> {
-        let problem = Problem::load(2025, 8)?;
-
-        let input = problem.get_input(1, &InputType::Sample)?;
-        let answer = problem.get_answer(1, &InputType::Sample)?;
-
-        assert_eq!(answer, super::solve(&input));
-
+    fn part_1_sample() -> Result<()> {
+        assert_solution!(part_1, "sample");
         Ok(())
     }
 
     #[test]
-    fn test_full() -> Result<()> {
-        let problem = Problem::load(2025, 8)?;
+    fn part_1_full() -> Result<()> {
+        assert_solution!(part_1, "full");
+        Ok(())
+    }
 
-        let input = problem.get_input(1, &InputType::Full)?;
-        let answer = problem.get_answer(1, &InputType::Full)?;
+    #[test]
+    fn part_2_sample() -> Result<()> {
+        assert_solution!(part_2, "sample");
+        Ok(())
+    }
 
-        assert_eq!(answer, super::solve(&input));
-
+    #[test]
+    fn part_2_full() -> Result<()> {
+        assert_solution!(part_2, "full");
         Ok(())
     }
 }

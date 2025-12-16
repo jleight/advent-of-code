@@ -1,8 +1,11 @@
+mod asserts;
 mod errors;
-mod problem;
 mod solution_test;
+mod traits;
+
+#[cfg(test)]
+pub(crate) use asserts::*;
 
 pub use errors::*;
-pub use problem::{InputType, Problem};
 pub use solution_test::SolutionTest;
-pub(crate) use solution_test::test_solution;
+pub use traits::*;

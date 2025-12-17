@@ -1,12 +1,13 @@
 use crate::aoc::Error::UnexpectedInput;
 use crate::aoc::{FailedToParseInputSnafu, IntoResult, Result, UnexpectedInputSnafu};
-use snafu::{ensure, OptionExt, ResultExt};
+use snafu::{OptionExt, ResultExt, ensure};
 use std::str::FromStr;
 
 pub fn part_1(input: &str) -> Result<u32> {
     parse(input)?
         .iter()
-        .filter_map(|g| if g.is_valid() { Some(g.id) } else { None })
+        .filter(|g| g.is_valid())
+        .map(|g| g.id)
         .sum::<u32>()
         .into_result()
 }
@@ -20,8 +21,10 @@ pub fn part_2(input: &str) -> Result<u32> {
 }
 
 fn parse(input: &str) -> Result<Vec<Game>> {
-    input.lines().map(Game::from_str).collect()
-
+    input
+        .lines()
+        .map(Game::from_str)
+        .collect()
 }
 
 #[derive(Debug)]
@@ -44,24 +47,31 @@ impl FromStr for Reveal {
                 .split_whitespace()
                 .collect();
 
-            ensure!(split.len() == 2, UnexpectedInputSnafu {
-                expected: "[count] [color]",
-                got: cube_count,
-            });
+            ensure!(
+                split.len() == 2,
+                UnexpectedInputSnafu {
+                    expected: "[count] [color]",
+                    got: cube_count,
+                }
+            );
 
-            let count = split[0].parse::<u32>().context(FailedToParseInputSnafu{
-                expected: "[count]",
-                got: split[0],
-            })?;
+            let count = split[0]
+                .parse::<u32>()
+                .context(FailedToParseInputSnafu {
+                    expected: "[count]",
+                    got: split[0],
+                })?;
 
             match split[1] {
                 "red" => red += count,
                 "green" => green += count,
                 "blue" => blue += count,
-                _ => return Err(UnexpectedInput{
-                    expected: "red, green, or blue",
-                    got: split[1].to_string(),
-                }),
+                _ => {
+                    return Err(UnexpectedInput {
+                        expected: "red, green, or blue",
+                        got: split[1].to_string(),
+                    });
+                }
             }
         }
 
@@ -79,10 +89,12 @@ impl FromStr for Game {
     type Err = crate::aoc::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (game, reveals) = s.split_once(':').context(UnexpectedInputSnafu{
-            expected: "Game [id]: [reveals...]",
-            got: s,
-        })?;
+        let (game, reveals) = s
+            .split_once(':')
+            .context(UnexpectedInputSnafu {
+                expected: "Game [id]: [reveals...]",
+                got: s,
+            })?;
 
         let id = game
             .replace("Game ", "")
@@ -96,7 +108,10 @@ impl FromStr for Game {
             .map(Reveal::from_str)
             .collect();
 
-        Ok(Self { id, reveals: reveals? })
+        Ok(Self {
+            id,
+            reveals: reveals?,
+        })
     }
 }
 
@@ -134,7 +149,7 @@ impl Game {
 #[cfg(test)]
 mod tests {
     use super::{part_1, part_2};
-    use crate::aoc::{assert_solution, Result};
+    use crate::aoc::{Result, assert_solution};
 
     const YEAR: u16 = 2023;
     const DAY: u8 = 2;

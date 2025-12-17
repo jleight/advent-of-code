@@ -98,7 +98,7 @@ enum Operation {
 #[cfg(test)]
 mod tests {
     use super::{part_1, part_2};
-    use crate::aoc::{assert_solution, Result};
+    use crate::aoc::{Result, assert_solution};
 
     const YEAR: u16 = 2025;
     const DAY: u8 = 6;

@@ -1,88 +1,83 @@
-pub fn part_1(input: &str) -> u64 {
-    let mut sum = 0;
+use crate::aoc::Result;
+use crate::aoc::{FailedToParseInputSnafu, IntoResult, UnexpectedInputSnafu};
+use snafu::{OptionExt, ResultExt};
+use std::ops::RangeInclusive;
 
-    for range in input.split(',') {
-        let (start, end) = range
-            .split_once('-')
-            .expect("range should contain a '-'");
+pub fn part_1(input: &str) -> Result<u64> {
+    parse(input)?
+        .filter(|(_, s)| s.len() % 2 == 0)
+        .filter_map(|(i, s)| {
+            let middle = s.len() / 2;
+            let left = &s[..middle];
+            let right = &s[middle..];
 
-        let start = start
-            .parse::<u64>()
-            .expect("start is not a number");
-        let end = end
-            .parse::<u64>()
-            .expect("end is not a number");
-
-        for i in start..=end {
-            let str = i.to_string();
-
-            if str.len() % 2 != 0 {
-                continue;
-            }
-
-            let middle = str.len() / 2;
-            let left = &str[..middle];
-            let right = &str[middle..];
-
-            if left == right {
-                sum += i;
-            }
-        }
-    }
-
-    sum
+            if left == right { Some(i) } else { None }
+        })
+        .sum::<u64>()
+        .into_result()
 }
 
-pub fn part_2(input: &str) -> u64 {
-    let mut sum = 0;
-
-    for range in input.split(',') {
-        let (start, end) = range
-            .split_once('-')
-            .expect("range should contain a '-'");
-
-        let start = start
-            .parse::<u64>()
-            .expect("start is not a number");
-        let end = end
-            .parse::<u64>()
-            .expect("end is not a number");
-
-        for i in start..=end {
-            let str = i.to_string();
-            let str_len = str.len();
-
-            let half_len = str_len / 2;
-
-            let mut success = false;
+pub fn part_2(input: &str) -> Result<u64> {
+    parse(input)?
+        .filter_map(|(i, s)| {
+            let len = s.len();
+            let half_len = len / 2;
 
             for j in 1..=half_len {
-                if str_len % j != 0 {
+                if len % j != 0 {
                     continue;
                 }
 
-                let pattern = str[0..j].to_string();
-                let test = pattern.repeat(str_len / j);
+                let pattern = s[0..j].to_string();
+                let test = pattern.repeat(len / j);
 
-                if str == test {
-                    success = true;
-                    break;
+                if s == test {
+                    return Some(i);
                 }
             }
 
-            if success {
-                sum += i;
-            }
-        }
-    }
+            None
+        })
+        .sum::<u64>()
+        .into_result()
+}
 
-    sum
+fn parse(input: &str) -> Result<impl Iterator<Item = (u64, String)>> {
+    input
+        .split(',')
+        .map(|range| {
+            let (start, end) = range
+                .split_once('-')
+                .context(UnexpectedInputSnafu {
+                    expected: "[start]-[end]",
+                    got: range,
+                })?;
+
+            let start = start
+                .parse::<u64>()
+                .context(FailedToParseInputSnafu {
+                    expected: "\\d+",
+                    got: start,
+                })?;
+            let end = end
+                .parse::<u64>()
+                .context(FailedToParseInputSnafu {
+                    expected: "\\d+",
+                    got: end,
+                })?;
+
+            Ok::<RangeInclusive<u64>, crate::aoc::Error>(start..=end)
+        })
+        .flat_map(Result::into_iter)
+        .flat_map(RangeInclusive::into_iter)
+        .map(|i| (i, i.to_string()))
+        .into_result()
 }
 
 #[cfg(test)]
 mod tests {
     use super::{part_1, part_2};
-    use crate::aoc::{assert_solution, Result};
+    use crate::aoc::{Result, assert_solution};
 
     const YEAR: u16 = 2025;
     const DAY: u8 = 2;

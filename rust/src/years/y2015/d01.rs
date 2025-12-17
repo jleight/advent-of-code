@@ -2,9 +2,7 @@ use itertools::FoldWhile::{Continue, Done};
 use itertools::Itertools;
 
 pub fn part_1(input: &str) -> i32 {
-    parse(input)
-        .iter()
-        .sum()
+    parse(input).iter().sum()
 }
 
 pub fn part_2(input: &str) -> i128 {
@@ -12,25 +10,22 @@ pub fn part_2(input: &str) -> i128 {
         .iter()
         .enumerate()
         .map(|(i, e)| (i as i128 + 1, i128::from(*e)))
-        .fold_while(0, |a, (i, e)| {
-            if a + e < 0 {
-                Done(i)
-            } else {
-                Continue(a + e)
-            }
-        })
+        .fold_while(
+            0,
+            |a, (i, e)| {
+                if a + e < 0 { Done(i) } else { Continue(a + e) }
+            },
+        )
         .into_inner()
 }
 
 fn parse(input: &str) -> Vec<i32> {
     input
         .chars()
-        .filter_map(|c| {
-            match c {
-                '(' => Some(1),
-                ')' => Some(-1),
-                _ => None
-            }
+        .filter_map(|c| match c {
+            '(' => Some(1),
+            ')' => Some(-1),
+            _ => None,
         })
         .collect()
 }
@@ -38,7 +33,7 @@ fn parse(input: &str) -> Vec<i32> {
 #[cfg(test)]
 mod tests {
     use super::{part_1, part_2};
-    use crate::aoc::{assert_solution, Result};
+    use crate::aoc::{Result, assert_solution};
 
     const YEAR: u16 = 2015;
     const DAY: u8 = 1;

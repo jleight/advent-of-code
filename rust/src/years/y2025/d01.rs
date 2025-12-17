@@ -1,57 +1,90 @@
-pub fn part_1(input: &str) -> u16 {
-    let mut current = 50i16;
-    let mut count = 0u16;
+use crate::aoc::Error::UnexpectedInput;
+use crate::aoc::{FailedToParseInputSnafu, IntoResult, Result};
+use snafu::ResultExt;
 
-    for (i, line) in input.lines().enumerate() {
-        let direction = if line.starts_with('R') { 1i16 } else { -1 };
+pub fn part_1(input: &str) -> Result<u16> {
+    parse(input)?
+        .iter()
+        .fold((50, 0), |(current, count), (direction, steps)| {
+            let direction = match direction {
+                Direction::Right => 1i16,
+                Direction::Left => -1,
+            };
 
-        let Ok(steps) = line[1..].parse::<i16>() else {
-            panic!("line {i} is invalid: {line}");
-        };
+            let current = (current + (100 + steps * direction)) % 100;
+            let count = if current == 0 { count + 1 } else { count };
 
-        current = (current + (100 + steps * direction)) % 100;
-
-        if current == 0 {
-            count += 1;
-        }
-    }
-
-    count
+            (current, count)
+        })
+        .1
+        .into_result()
 }
 
-pub fn part_2(input: &str) -> i32 {
-    let mut current = 50;
-    let mut count = 0;
+pub fn part_2(input: &str) -> Result<i32> {
+    parse(input)?
+        .iter()
+        .fold((50, 0), |(current, count), (direction, steps)| {
+            let (mut current, mut count) = match direction {
+                Direction::Right => (current + steps, count),
+                Direction::Left => (current - steps, count),
+            };
+            
+            while current >= 100 {
+                current -= 100;
+                count += 1;
+            }
 
-    for (i, line) in input.lines().enumerate() {
-        let Ok(steps) = line[1..].parse::<i32>() else {
-            panic!("line {i} is invalid: {line}");
-        };
+            while current < 0 {
+                current += 100;
+                count += 1;
+            }
 
-        current = if line.starts_with('R') {
-            current + steps
-        } else {
-            current - steps
-        };
+            (current, count)
+        })
+        .1
+        .into_result()
+}
 
-        while current >= 100 {
-            current -= 100;
-            count += 1;
-        }
+fn parse(input: &str) -> Result<Vec<(Direction, i16)>> {
+    input
+        .lines()
+        .map(|line| {
+            let direction = match line.chars().next() {
+                Some('R') => Direction::Right,
+                Some('L') => Direction::Left,
+                _ => {
+                    return Err(UnexpectedInput {
+                        expected: "red, green, or blue",
+                        got: line
+                            .chars()
+                            .next()
+                            .unwrap_or(' ')
+                            .to_string(),
+                    });
+                }
+            };
 
-        while current < 0 {
-            current += 100;
-            count += 1;
-        }
-    }
+            let steps = line[1..]
+                .parse::<i16>()
+                .context(FailedToParseInputSnafu {
+                    expected: "[RL]\\d+",
+                    got: line,
+                })?;
 
-    count
+            Ok((direction, steps))
+        })
+        .collect()
+}
+
+enum Direction {
+    Right,
+    Left,
 }
 
 #[cfg(test)]
 mod tests {
     use super::{part_1, part_2};
-    use crate::aoc::{assert_solution, Result};
+    use crate::aoc::{Result, assert_solution};
 
     const YEAR: u16 = 2025;
     const DAY: u8 = 1;

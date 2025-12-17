@@ -1,6 +1,6 @@
-use std::collections::HashMap;
+use crate::aoc::{Result, SolutionFailedSnafu};
 use snafu::OptionExt;
-use crate::aoc::{SolutionFailedSnafu, Result};
+use std::collections::HashMap;
 
 pub fn part_1(input: &str) -> Result<u32> {
     input
@@ -10,15 +10,19 @@ pub fn part_1(input: &str) -> Result<u32> {
                 .chars()
                 .filter_map(|c| c.to_digit(10));
 
-            let first = digits.next().context(SolutionFailedSnafu{})?;
-            let last = digits.next_back().unwrap_or(first);
+            let first = digits
+                .next()
+                .context(SolutionFailedSnafu {})?;
+            let last = digits
+                .next_back()
+                .unwrap_or(first);
 
             Ok(first * 10 + last)
         })
         .sum()
 }
 
-pub fn part_2(input: &str) -> u32 {
+pub fn part_2(input: &str) -> Result<i32> {
     let digits = HashMap::from([
         ("1", 1),
         ("one", 1),
@@ -43,32 +47,23 @@ pub fn part_2(input: &str) -> u32 {
     input
         .lines()
         .map(|line| {
-            let mut first = 0;
-            let mut last = 0;
-
-            for i in 0..line.len() {
-                if let Some(f) = digits
+            let try_get_starting_digit = |i: usize| {
+                digits
                     .keys()
                     .find(|w| line[i..].starts_with(*w))
-                    .map(|w| digits[w])
-                {
-                    first = f;
-                    break;
-                }
-            }
+                    .and_then(|w| digits.get(w))
+            };
 
-            for i in (0..line.len()).rev() {
-                if let Some(l) = digits
-                    .keys()
-                    .find(|w| line[i..].starts_with(*w))
-                    .map(|w| digits[w])
-                {
-                    last = l;
-                    break;
-                }
-            }
+            let first = (0..line.len())
+                .find_map(try_get_starting_digit)
+                .context(SolutionFailedSnafu {})?;
 
-            first * 10 + last
+            let last = (0..line.len())
+                .rev()
+                .find_map(try_get_starting_digit)
+                .context(SolutionFailedSnafu {})?;
+
+            Ok(first * 10 + last)
         })
         .sum()
 }
@@ -76,7 +71,7 @@ pub fn part_2(input: &str) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::{part_1, part_2};
-    use crate::aoc::{assert_solution, Result};
+    use crate::aoc::{Result, assert_solution};
 
     const YEAR: u16 = 2023;
     const DAY: u8 = 1;

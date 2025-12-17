@@ -1,6 +1,5 @@
 [tools]
-rust = "latest"
-pkl = "latest"
+rust = "nightly-2025-12-16"
 
 [tasks.lint]
 run = "cargo clippy"

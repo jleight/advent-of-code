@@ -5,7 +5,6 @@ mod traits;
 
 #[cfg(test)]
 pub(crate) use asserts::*;
-
 pub use errors::*;
 pub use solution_test::SolutionTest;
 pub use traits::*;
